@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Dirac's theorem: k vertices of a k-connected graph lie on a common cycle"
+  description: >-
+    A Lean 4 / Mathlib formalization of Dirac's 1960 theorem: in a k-connected finite simple graph
+    with k ≥ 2 (more than k vertices, and connected after deleting any set of fewer than k
+    vertices), any set of at most k vertices lies on a common cycle. In particular, in a
+    2-connected finite graph any two vertices lie on a common cycle. Cycles are Mathlib's
+    `SimpleGraph.Walk.IsCycle`. Mathlib does not have this theorem.
+  authors:
+    - "Juan Pablo Traverso Gianini"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Juan Pablo Traverso Gianini"
+
+classification:
+  arxiv: ["math.CO"]
+  msc2020: ["05C38", "05C40"]
+
+sources:
+  - title: "In abstrakten Graphen vorhandene vollständige 4-Graphen und ihre Unterteilungen"
+    authors:
+      - "G. A. Dirac"
+    id: "doi:10.1002/mana.19600220107"
+    type: "paper"
+    location: "Mathematische Nachrichten 22 (1960), 61–85"
+    relationship: "formalizes"
+    note: "Any k vertices of a k-connected graph lie on a common cycle."
+    license: "all rights reserved"
+    author_endorsement: "n/a"
+
+related_formalizations:
+  - id: "PALOMAR-2026-10-15-000020 (jtraverso/menger-hamiltonian)"
+    relationship: "builds-on"
+    note: >-
+      The same author's Menger / Hamiltonicity entry. Its library `MengerHamilton/` (commit
+      b6cf60e) is included unchanged and provides Menger's theorem, the fan lemma `exists_fan`
+      and the cyclic arrangements `CycArr`.
+
+status:
+  scope: "Proved for every finite simple graph and every k ≥ 2 (vertex types in any universe)."
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+
+automation:
+  methods:
+    - method: "autonomous"
+      models: ["Aristotle (Harmonic)"]
+      framework: "Aristotle CLI"
+      tool_setup: >-
+        Produced all proofs in one run from the formal statements and a proof plan (fan lemma,
+        gap counting and splicing on top of `MengerHamilton`); the return was audited (statements
+        and headers unchanged, library unchanged, no added axioms) and rebuilt locally.
+      cost:
+        wall_time: "under one hour"
+        spend_usd: "not tracked"
+        hardware: "API-only"
+      prompting_notes: "Formal statements and proof plan supplied."
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: >-
+        Statement design, proof plan, integration and review of the Aristotle return, and the
+        Palomar packaging, checked with `lake build` and `#print axioms` (Lean v4.35.0-rc3,
+        Mathlib c55e6e786f49471c72fbddbec5415808896aec1e).
+      cost:
+        wall_time: "about one hour"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "Natural-language instructions in Spanish, directed by the author."
+  spend_usd: "subscription-based"
+  notes: >-
+    The result was chosen by the human author; the Lean proofs are AI-generated and mechanically
+    verified (no `sorry`, axioms limited to propext, Classical.choice and Quot.sound, identical
+    elaborated types for the Challenge/Solution pair).
+
+fidelity:
+  divergences: >-
+    k-connectivity is stated directly as `k < Fintype.card V` together with
+    `(G.induce Sᶜ).Connected` for every vertex set S with `S.ncard < k`. The conclusion gives a
+    closed walk `c` with `c.IsCycle` (Mathlib's cycles: closed trails of positive length with no
+    repeated vertex other than the endpoints) whose support contains every vertex of the given set
+    S, for any finite set S with at most k elements.
+
+review:
+  status: "agent-reviewed"
+  reviewers:
+    - "Claude Opus 5.5 (AI agent in Claude Code, acting for the author)"
+  notes: >-
+    Agent review by Claude Opus 5.5, distinct from the mechanical verification: the agent
+    compared the statements with Dirac's theorem, checked the encoding of k-connectivity, checked
+    that the Aristotle return left every statement and header and the reused library unchanged,
+    and confirmed by `lake build`, `#print axioms` and a comparison of the fully elaborated
+    Challenge and Solution types that the proofs use no `sorry` and only propext,
+    Classical.choice and Quot.sound. The author directed the work and approved the statements.
+    No independent human mathematical review has been performed. The result is classical; no
+    mathematical novelty is claimed.
+
+alignment:
+  namespace: "CommonCycle"
+  statements:
+    - source: "Dirac (1960): any k vertices of a k-connected graph lie on a common cycle"
+      lean: "CommonCycle.exists_cycle_through"
+      module: "Challenge"
+      status: "proved"
+    - source: "Any two vertices of a 2-connected graph lie on a common cycle"
+      lean: "CommonCycle.exists_cycle_through_pair"
+      module: "Challenge"
+      status: "proved"
+
+acknowledgements: >-
+  Mathlib and the Lean community; Harmonic's Aristotle.
